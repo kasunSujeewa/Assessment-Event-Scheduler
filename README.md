@@ -81,6 +81,10 @@ This project is a Laravel 11 application using Livewire for dynamic, reactive co
    ```bash
    php artisan serve
    ```
+   ```bash
+   php artisan queue:work --queue=high,low
+   ```
+   For Run Job Queues
 
 2. **Compile assets:**
 

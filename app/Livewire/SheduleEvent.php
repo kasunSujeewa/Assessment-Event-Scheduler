@@ -17,15 +17,12 @@ class SheduleEvent extends Component
     use WithPagination;
     public $title, $description, $starting_time, $ending_time, $notify_data, $scheduleEvent = [], $scheduleEventService, $now, $courses, $notifcation_data = [];
 
-    // public function __construct( ScheduleEventServise $scheduleEventService) {
-    //     $this->scheduleEventService = $scheduleEventService;
-    // }
+
 
     public function render()
     {
         $this->now = Carbon::now()->format('Y-m-d H:i');
         $this->courses = Course::orderBy('created_at', 'desc')->get();
-        //$this->scheduleEvent = ScheduledEvent::orderBy('created_at','desc')->paginate(10);
         return view('livewire.shedule-event', [
             'Events' => ScheduledEvent::orderBy('created_at', 'desc')->paginate(10)
         ]);
@@ -35,7 +32,8 @@ class SheduleEvent extends Component
     {
         $validatedData = $this->validate([
             'title' => 'required|min:3',
-            'starting_time' => 'required',
+            'starting_time' => 'required|unique:scheduled_events,starting_time',
+            'ending_time' => 'nullable|after:starting_time',
             'notify_data' => 'required'
         ]);
 
@@ -54,7 +52,7 @@ class SheduleEvent extends Component
             'notify_data' => $this->notify_data,
         ]);
 
-        event(new NotifyEventWhenEventCreated(json_decode($this->notify_data),$this->title,$this->starting_time));
+        event(new NotifyEventWhenEventCreated(json_decode($this->notify_data), $this->title, $this->starting_time));
         $this->reset(['title', 'description', 'starting_time', 'ending_time', 'notify_data', 'notifcation_data']);
 
         //session()->flash('message', 'Your event scheduled successfully.');
